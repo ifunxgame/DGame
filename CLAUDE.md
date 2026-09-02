@@ -33,6 +33,7 @@
 | 整包 / AB 打包 / Jenkins 自动化 / ReleaseTools | `build-pipeline.md` |
 | 热更代码 / HybridCLR / AOT 泛型 | `hotfix-workflow.md` |
 | 模块 API / DataCenterModule / MemoryPool / Audio / Fsm | `modules.md` |
+| 新增模块 / ModuleSystem / SingletonSystem / 模块热插拔 | `module-system.md` |
 | 事件系统 / EventCenter / 事件反模式 | `event-system.md`、`event-antipatterns.md` |
 | Luban 配置消费 | `luban-config.md`；编辑配置表时使用 `luban-dev` |
 | 红点系统 | `reddot-system.md` |
@@ -88,6 +89,7 @@
 |------|------|
 | 项目结构 / 启动 / 分层 | `architecture.md` |
 | 模块访问 | `modules.md` |
+| 模块系统架构 / 新增模块 | `module-system.md` |
 | UI 开发 | `ui-lifecycle.md`、`ui-patterns.md` |
 | 事件系统 | `event-system.md`、`event-antipatterns.md` |
 | 资源加载 | `resource-api.md`、`resource-patterns.md` |

@@ -20,11 +20,14 @@ GameModule.LocalizationModule  // ILocalizationModule
 GameModule.GameObjectPool      // IGameObjectPoolModule
 GameModule.UIModule            // UIModule.Instance
 GameModule.RedDotModule        // RedDotModule.Instance
+GameModule.GuideModule         // GuideMgr.Instance
 
-GameModule.Destroy()           // 清空缓存，仅退出/热更销毁时调用
+GameModule.Destroy()           // 仅清空静态缓存字段，不销毁模块实例
 ```
 
-> **注意**：`UIModule`、`RedDotModule` 是热更层单例；其他大多数模块来自 `ModuleSystem.GetModule<T>()`。
+> **注意**：`UIModule`、`RedDotModule`、`GuideModule` 是热更层 `Singleton<T>`；其他模块来自 `ModuleSystem.GetModule<T>()`。
+> `IObjectPoolModule`、`IProcedureModule`、`IDebuggerModule`、`IMonoDriver` 未进门面，只能直接 `ModuleSystem.GetModule<T>()`。
+> 模块清单、注册机制与热插拔能力见 [module-system.md](module-system.md)。
 
 ---
 
@@ -285,9 +288,11 @@ DLogger.Assert(condition, "unexpected state");
 ## 新增模块规则
 
 1. 先搜索 DGame 是否已有封装：`GameTimer`、`InputModule`、`AnimModule`、`MemoryPool`、`GameObjectPool`、`GameEvent`、`LocalizationModule`。
-2. 框架模块放 `DGame/Runtime/Module` 并注册到 `ModuleSystem`。
-3. 业务单例模块放 `GameLogic/Module`，沿用 `Singleton<T>`。
+2. 框架模块放 `DGame/Runtime/Module`，继承 `DGame.Module`，接口与实现**同命名空间同程序集**且严格遵守 `IXxxModule` → `XxxModule` 命名（`ModuleSystem` 靠 `Type.GetType` 反推，名字不匹配直接创建失败）。无需手动注册，首次 `GetModule<IXxxModule>()` 时反射惰性创建。
+3. 业务单例模块放 `GameLogic/Module`，沿用 `Singleton<T>`，按需实现 `IUpdate`/`IFixedUpdate`/`ILateUpdate`。**需要运行时动态装卸的子系统只能走这一套**，框架层不支持模块热插拔。
 4. 需要业务统一访问时，在 `GameModule` 增加缓存属性。
+
+详细机制、完整模块清单与已知隐患见 [module-system.md](module-system.md)。
 
 ---
 
@@ -311,6 +316,7 @@ DLogger.Assert(condition, "unexpected state");
 
 | 关联主题 | 文档 | 说明 |
 |---------|------|------|
+| 模块系统架构 | module-system.md | 三套注册机制、完整模块清单、热插拔能力、已知隐患 |
 | UI 管理 | ui-lifecycle.md | `GameModule.UIModule` 的窗口生命周期与层级 |
 | 资源加载/卸载 | resource-api.md | `GameModule.ResourceModule` 的完整 API 与生命周期 |
 | 事件系统 | event-system.md | `GameEvent` 模块间解耦，`AddUIEvent` UI 内部事件 |

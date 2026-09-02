@@ -28,7 +28,8 @@ DGame 使用 HybridCLR + YooAsset + UniTask + Luban 构建。
 | 资源加载 | [resource-api.md](references/resource-api.md) | [resource-patterns.md](references/resource-patterns.md) | P0 |
 | 热更资源包 | [hotpatch-workflow.md](references/hotpatch-workflow.md) | [resource-api.md](references/resource-api.md) | P0 |
 | 构建打包 | [build-pipeline.md](references/build-pipeline.md) | [hotfix-workflow.md](references/hotfix-workflow.md) | P1 |
-| 模块使用 | [modules.md](references/modules.md) | — | P0 |
+| 模块使用 | [modules.md](references/modules.md) | [module-system.md](references/module-system.md) | P0 |
+| 模块系统架构 / 新增模块 / 热插拔 | [module-system.md](references/module-system.md) | [architecture.md](references/architecture.md) | P1 |
 | 热更代码 | [hotfix-workflow.md](references/hotfix-workflow.md) | — | P1 |
 | 代码规范 | [naming-rules.md](references/naming-rules.md) | — | P1 |
 | Luban 配置 | [luban-config.md](references/luban-config.md) | `luban-dev` | P1 |
