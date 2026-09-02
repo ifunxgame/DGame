@@ -15,7 +15,7 @@ public static class ClassReplaceHelper
         Component uiSprite = go.AddComponent(type);
         SerializedObject ob = new SerializedObject(uiSprite);
 #if UNITY_6000_1_OR_NEWER
-        EntityId classID = ob.FindProperty("m_Script").objectReferenceEntityIdValue;
+        EntityId classID = ob.FindProperty("m_Script").entityIdValue;
 #else
         int classID = ob.FindProperty("m_Script").objectReferenceInstanceIDValue;
 #endif
@@ -35,7 +35,7 @@ public static class ClassReplaceHelper
         SerializedObject ob = new SerializedObject(mb);
         ob.Update();
 #if UNITY_6000_1_OR_NEWER
-        ob.FindProperty("m_Script").objectReferenceEntityIdValue = id;
+        ob.FindProperty("m_Script").entityIdValue = id;
 #else
         ob.FindProperty("m_Script").objectReferenceInstanceIDValue = id;
 #endif
