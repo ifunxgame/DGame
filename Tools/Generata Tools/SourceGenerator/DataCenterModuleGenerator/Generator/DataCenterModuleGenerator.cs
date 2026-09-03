@@ -71,16 +71,20 @@ public class DataCenterModuleGenerator : ISourceGenerator
         sb.AppendLine($"namespace {Definition.NameSpace}");
         {
             sb.AppendLine("{");
-            sb.AppendLine($"\tpublic sealed partial class {Definition.TargetClassName}");
+            sb.AppendLine($"\tpublic partial class {Definition.TargetClassName}");
             {
                 sb.AppendLine("\t{");
                 sb.AppendLine();
                 sb.AppendLine("\t\tpartial void InitModule()");
                 {
                     sb.AppendLine("\t\t{");
-                    foreach (var (className, _) in moduleTypes)
+                    foreach (var (className, namespaceName) in moduleTypes)
                     {
-                        sb.AppendLine($"\t\t\tRegisterModule({className}.Instance);");
+                        // 带上命名空间限定，避免模块不在目标命名空间顶层时生成无法解析的裸类名
+                        var qualifiedName = string.IsNullOrEmpty(namespaceName)
+                            ? className
+                            : $"global::{namespaceName}.{className}";
+                        sb.AppendLine($"\t\t\tRegisterModule({qualifiedName}.Instance);");
                     }
                     sb.AppendLine("\t\t}");
                 }

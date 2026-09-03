@@ -10,6 +10,10 @@ namespace DGame
         private GameObject m_monoDriver;
         private MainMonoBehaviour m_monoBehaviour;
 
+        /// <summary>
+        /// 确保驱动 GameObject 存在，不存在则创建。
+        /// </summary>
+        /// <remarks>只在添加监听、启动协程等确实需要驱动的路径调用；移除监听不要调用，否则会在销毁期复活驱动。</remarks>
         private void _MakeDriver()
         {
             if (m_monoDriver != null)
@@ -135,7 +139,6 @@ namespace DGame
 
         public void RemoveUpdateListener(Action action)
         {
-            _MakeDriver();
             m_monoBehaviour?.RemoveUpdateListener(action);
         }
 
@@ -154,7 +157,6 @@ namespace DGame
 
         public void RemoveFixedUpdateListener(Action action)
         {
-            _MakeDriver();
             m_monoBehaviour?.RemoveFixedUpdateListener(action);
         }
 
@@ -172,7 +174,6 @@ namespace DGame
 
         public void RemoveLateUpdateListener(Action action)
         {
-            _MakeDriver();
             m_monoBehaviour?.RemoveLateUpdateListener(action);
         }
 
@@ -188,7 +189,6 @@ namespace DGame
 
         public void RemoveDestroyListener(Action action)
         {
-            _MakeDriver();
             m_monoBehaviour?.RemoveDestroyListener(action);
         }
 
@@ -200,7 +200,6 @@ namespace DGame
 
         public void RemoveOnDrawGizmosListener(Action action)
         {
-            _MakeDriver();
             m_monoBehaviour?.RemoveOnDrawGizmosListener(action);
         }
 
@@ -212,7 +211,6 @@ namespace DGame
 
         public void RemoveOnDrawGizmosSelectedListener(Action action)
         {
-            _MakeDriver();
             m_monoBehaviour?.RemoveOnDrawGizmosSelectedListener(action);
         }
 
@@ -224,7 +222,6 @@ namespace DGame
 
         public void RemoveOnApplicationPauseListener(Action<bool> action)
         {
-            _MakeDriver();
             m_monoBehaviour?.RemoveOnApplicationPauseListener(action);
         }
 

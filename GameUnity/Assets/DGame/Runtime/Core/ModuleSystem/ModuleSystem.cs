@@ -17,6 +17,13 @@ namespace DGame
         private static readonly LinkedList<Module> m_updateModules = new LinkedList<Module>();
         private static readonly List<IUpdateModule> m_updateExecuteList = new List<IUpdateModule>(DEFAULT_MODULE_COUNT);
         private static bool m_isExecuteListDirty;
+        private static bool m_isDestroyed;
+
+        /// <summary>
+        /// 模块系统是否已销毁
+        /// </summary>
+        /// <remarks>销毁后不再创建任何模块，避免在 OnDestroy 期间复活模块并新建 GameObject</remarks>
+        public static bool IsDestroyed => m_isDestroyed;
 
         #region Update 模块轮询
 
@@ -27,6 +34,11 @@ namespace DGame
         /// <param name="realElapsedTime">真实时间间隔 秒为单位</param>
         public static void Update(float elapsedTime, float realElapsedTime)
         {
+            if (m_isDestroyed)
+            {
+                return;
+            }
+
             if (m_isExecuteListDirty)
             {
                 m_isExecuteListDirty = false;
@@ -67,6 +79,12 @@ namespace DGame
                 return module as T;
             }
 
+            if (m_isDestroyed)
+            {
+                DLogger.Warning("模块系统已销毁，不再创建模块：{0}", type.FullName);
+                return null;
+            }
+
             // 获取模块名 命名空间.模块 因为传进来的必须是一个接口类型 所以裁剪掉开头的I字母
             string moduleName = $"{type.Namespace}.{type.Name.Substring(1)}, {type.Assembly.GetName().Name}";
             // string moduleName = Utility.StringUtil.Format("{0}.{1}", type.Namespace, type.Name.Substring(1));
@@ -75,12 +93,30 @@ namespace DGame
             {
                 throw new DGameException(Utility.StringUtil.Format("找不到该类型的游戏模块：", moduleName));
             }
-            return GetModule(moduleType) as T;
+
+            Module target = GetModule(moduleType);
+            if (target != null)
+            {
+                // 以接口类型建立别名索引，后续直接命中上面的快路径，避免每次都反射查找类型
+                m_moduleMaps[type] = target;
+            }
+            return target as T;
         }
 
         public static Module GetModule(Type type)
         {
-            return m_moduleMaps.TryGetValue(type, out Module module) ? module : CreateModule(type);
+            if (m_moduleMaps.TryGetValue(type, out Module module))
+            {
+                return module;
+            }
+
+            if (m_isDestroyed)
+            {
+                DLogger.Warning("模块系统已销毁，不再创建模块：{0}", type.FullName);
+                return null;
+            }
+
+            return CreateModule(type);
         }
 
         #endregion
@@ -123,7 +159,15 @@ namespace DGame
                 throw new DGameException(Utility.StringUtil.Format("注册的游戏模块必须是接口类型的", type.FullName));
             }
 
+            if (m_isDestroyed)
+            {
+                DLogger.Warning("模块系统已销毁，不再注册模块：{0}", type.FullName);
+                return null;
+            }
+
             m_moduleMaps[type] = module;
+            // 同时以具体类型建立索引，与 CreateModule 的键保持一致，避免 GetModule(Type) 重复创建实例
+            m_moduleMaps[module.GetType()] = module;
             RegisterUpdateModule(module);
             return module as T;
         }
@@ -203,6 +247,7 @@ namespace DGame
             m_updateExecuteList.Clear();
             MemoryPool.ClearAll();
             Utility.Marshal.FreeCachedHGlobal();
+            m_isDestroyed = true;
         }
     }
 }

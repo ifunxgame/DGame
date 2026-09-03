@@ -33,7 +33,10 @@ namespace DGame
 
             private void OnDestroy()
             {
-                OnDestroyEvent?.Invoke();
+                // 取出后置空再触发，保证销毁回调在任何销毁顺序下都只执行一次。
+                Action destroyEvent = OnDestroyEvent;
+                OnDestroyEvent = null;
+                destroyEvent?.Invoke();
             }
 
             [Conditional("UNITY_EDITOR")]
@@ -133,10 +136,15 @@ namespace DGame
 
             public void Destroy()
             {
+                // 先触发销毁回调再清空：ModuleSystem.Destroy() 可能先于 GameObject 销毁执行，
+                // 若直接清空会导致挂在此处的热更层清理入口被静默跳过。
+                Action destroyEvent = OnDestroyEvent;
+                OnDestroyEvent = null;
+                destroyEvent?.Invoke();
+
                 OnUpdateEvent = null;
                 OnFixedUpdateEvent = null;
                 OnLateUpdateEvent = null;
-                OnDestroyEvent = null;
                 OnDrawGizmosEvent = null;
                 OnDrawGizmosSelectedEvent = null;
                 OnApplicationPauseEvent = null;

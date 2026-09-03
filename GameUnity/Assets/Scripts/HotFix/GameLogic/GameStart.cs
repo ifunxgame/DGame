@@ -95,6 +95,10 @@ public partial class GameStart
 
     private static void StartGame()
     {
+        // 激活数据中心宿主：触发 OnInit -> InitModule 注册各 DataCenterModule，
+        // 并经 SingletonSystem.Register 接入 Update 驱动。
+        _ = DataCenterSys.Instance;
+
         GameModule.UIModule.ShowWindow<MainWindow>();
     }
 
